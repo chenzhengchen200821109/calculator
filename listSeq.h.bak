@@ -1,0 +1,24 @@
+#if !defined listSeq_h
+#define listSeq_h
+
+#include "list.h"
+#include "hashTable.h"
+
+/* class ListSeq // nested in class List
+{
+    public:
+        ListSeq(const List& list) : _pLink(list.GetHead()) {}
+        bool AtEnd() const { return _pLink == 0; }
+        void Advance() { _pLink = _pLink->Next(); }
+        int GetId() const { return _pLink->Id(); }
+    private:
+        List::Link const *_pLink;
+}; */
+
+/* class IdSeq : public List<int>::Seq // nested in class HTable
+{
+    public:
+        IdSeq(const HTable& htab, const char *str) : List<int>::Seq(htab.Find(str)) {}
+}; */
+
+#endif

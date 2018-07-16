@@ -1,0 +1,26 @@
+#include "list.h"
+
+List::~List()
+{
+    while(_pHead != 0) {
+        Link* pLinkTmp = _pHead;
+        _pHead = _pHead->Next();
+        delete pLinkTmp;
+    }
+}
+
+void List::Add(int id)
+{
+    Link* pLink = new Link(_pHead, id);
+    _pHead = pLink;
+}
+
+bool List::Find(int id) const
+{
+    for (Link const* pLink = GetHead(); pLink != 0; pLink = pLink->Next()) {
+        if (pLink->Id() == id)
+            return true;
+    }
+    return false;
+}
+

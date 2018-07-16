@@ -1,0 +1,14 @@
+#include "strbuf.h"
+
+void StringBuffer::Reallocate(int addLen)
+{
+    int newSize = _bufSize * 2;
+    if (newSize < _curOffset + addLen)
+        newSize = _curOffset + addLen;
+    char *newBuf = new char [newSize];
+    for (int i = 0; i < _curOffset; ++i)
+        newBuf[i] = _buf[i];
+    delete [] _buf;
+    _buf = newBuf;
+    _bufSize = newSize;
+}
