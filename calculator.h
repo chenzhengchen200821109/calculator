@@ -4,12 +4,23 @@
 #include "symbolTable.h"
 #include "functionTable.h"
 #include "store.h"
+#include "serialize.h"
 
 class Calculator
 {
     friend class Parser;
     public:
         Calculator() : _funTab(_symTab), _store(_symTab) {}
+        void Serialize(Serializer& out)
+        {
+            _symTab.Serialize(out);
+            _store.Serialize(out);
+        }
+        void DeSerialize(DeSerializer& in)
+        {
+            _symTab.DeSerialize(in);
+            _store.DeSerialize(in);
+        }
     private:
         Store& GetStore() { return _store; }
         PtrFun GetFun(std::size_t id) const

@@ -1,9 +1,9 @@
-#if !defined parser_h
-#define parser_h
+#if !defined _PARSER_H
+#define _PARSER_H
 
 #include "scanner.h"
 #include "tree.h"
-#include "calculator.h"
+#include "Calculator.h"
 
 enum Status
 {

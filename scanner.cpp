@@ -4,7 +4,8 @@
 #include <cstring>
 #include "scanner.h"
 
-Scanner::Scanner(std::istream & in) : _in(in)
+// We get first token from Scanner constructor
+Scanner::Scanner(std::string& str) : _str(str), _index(0)
 {
     Accept();
     _isEmpty = (Token() == tEnd);
@@ -12,67 +13,88 @@ Scanner::Scanner(std::istream & in) : _in(in)
 
 void Scanner::Accept()
 {
-    ReadChar();
-    switch(_look)
+    if (_index == _str.size()) {
+        _token = tEnd;
+        return;
+    }
+    ReadChar(); // skip blank spaces and get current character
+    switch(_ch)
     {
         case '+':
             _token = tPlus;
+            ++_index;
             break;
         case '-':
             _token = tMinus;
+            ++_index;
             break;
         case '*':
             _token = tMult;
+            ++_index;
             break;
         case '/':
             _token = tDivide;
+            ++_index;
             break;
         case '(':
             _token = tLParen;
+            ++_index;
             break;
         case ')':
             _token = tRParen;
+            ++_index;
             break;
         case '=':
             _token = tAssign;
+            ++_index;
             break;
         case '0': case '1': case '2': case '3': case '4':
         case '5': case '6': case '7': case '8': case '9':
         case '.': 
         {
             _token = tNumber;
-            _in.putback(_look);
-            _in >> _number; // Read the whole number
+            _symbol.erase();
+            do {
+                _symbol += _ch;
+                ++_index;
+                _ch = _str[_index];
+            } while (std::isdigit(_ch) || _ch == '.');
+            //std::cout << _symbol << std::endl;
+            _number = std::stod(_symbol);
             break;
         }
         case '!':
             _token = tCommand;
+            ++_index;
             break;
-        case '\n':
-        case '\r':
-        case EOF:
-            _token = tEnd;
-            break;
+        //case '\n':
+        //case '\r':
+        //case EOF:
+        //    _token = tEnd;
+        //    break;
         default:
-            if (std::isalpha(_look) || _look == '_') 
+            if (std::isalpha(_ch) || _ch == '_')
             {
                 _token = tIdent;
                 _symbol.erase();
-                int cLook;
                 do {
-                        _symbol += _look;
-                        _look = _in.get(); 
-                } while (std::isalnum(_look));
-                _in.putback(_look);
+                    _symbol += _ch;
+                    _index++;
+                    _ch = _str[_index];
+                } while (std::isalnum(_ch));
             } else
-                _token = tError;
+                _token = tError; // invalid identification
             break;
     }
 }
 
 void Scanner::ReadChar()
 {
-    _look = _in.get();
-    while (_look == ' ' || _look == '\t')
-        _look = _in.get();
+    for ( ; _index < _str.size(); ++_index) {
+        _ch = _str[_index]; // we get current character here
+        if (_ch == ' ' || _ch == '\t')
+            continue;
+        else
+            break;
+    }
 }

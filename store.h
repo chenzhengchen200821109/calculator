@@ -1,5 +1,5 @@
-#if !defined store_h
-#define store_h
+#if !defined _STORE_H
+#define _STORE_H
 
 #include "symbolTable.h"
 #include <cassert>
@@ -41,6 +41,29 @@ class Store
             _isInit.resize(id + 1);
             _cell[id] = val;
             _isInit[id] = true;
+        }
+        void Serialize(Serializer& out) const
+        {
+            std::size_t len = _cell.size();
+            out.PutLong(len);
+            for (std::size_t i = 0; i < len; ++i)
+            {
+                out.PutDouble(_cell[i]);
+                out.PutBool(_isInit[i]);
+            }
+        }
+        void DeSerialize(DeSerializer& in)
+        {
+            _cell.clear();
+            _isInit.clear();
+            std::size_t len = in.GetLong();
+            _cell.resize(len);
+            _isInit.resize(len);
+            for (std::size_t i = 0; i < len; ++i)
+            {
+                _cell[i] = in.GetDouble();
+                _isInit[i] = in.GetBool();
+            }
         }
     private:
         std::vector<double> _cell;

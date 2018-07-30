@@ -4,48 +4,53 @@
 #include <cassert>
 #include <iostream>
 #include <cstring>
+#include <string>
 
 enum EToken
 {
-    tCommand,
+    tCommand, // commands like !q
     tEnd,
     tError,
-    tNumber,
-    tPlus,
-    tMult,
-    tMinus,
-    tDivide,
-    tLParen,
-    tRParen,
-    tAssign,
-    tIdent
+    tNumber, // literal number
+    tPlus, // +
+    tMult, // *
+    tMinus, // -
+    tDivide, // /
+    tLParen, // (
+    tRParen, // )
+    tAssign, // = 
+    tIdent   // identification
 };
 
 class Scanner
 {
     public:
-        explicit Scanner(std::istream & in);
+        explicit Scanner(std::string& str);
         EToken Token() const { return _token; }
         void Accept();
         double Number() const { return _number; }
-        std::string GetSymbolName() const { return _symbol; };
-        bool IsDone() const { return _token == tEnd; }
-        bool IsEmpty() const { return _isEmpty; }
+        std::string GetSymbolName() const { return _symbol; }
+        bool IsDone() const { return _token == tEnd; } // it comes to end
+        bool IsEmpty() const { return _isEmpty; } // it is an empty line
         void AcceptCommand()
         {
             ReadChar();
             _symbol.erase();
-            while (!std::isspace(_look))
-            {
-                _symbol += _look;
-                _look = _in.get();
+            for ( ; _index < _str.size(); ++_index) {
+                _ch = _str[_index];
+                if (std::isspace(_ch))
+                    break;
+                else {
+                    _symbol += _ch;
+                }
             }
         }
         void ReadChar();
         bool IsCommand() { return _token == tCommand; }
     private:
-        std::istream & _in;
-        int _look;
+        std::string& _str;
+        char _ch;
+        int _index;
         bool _isEmpty;
         EToken _token;
         double _number;

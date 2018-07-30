@@ -1,7 +1,7 @@
 #ifndef _COMMANDPARSER_H
 #define _COMMANDPARSER_H
 
-#include "calculator.h"
+#include "Calculator.h"
 #include "scanner.h"
 #include "parser.h"
 

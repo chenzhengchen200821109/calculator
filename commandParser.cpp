@@ -1,3 +1,4 @@
+#include "serialize.h"
 #include "commandParser.h"
 
 const long Version = 1;
@@ -41,12 +42,12 @@ Status CommandParser::Execute()
             return Load(nameFile);
         case comQuit:
             std::cerr << "GoodBye!" << std::endl;
-            return stQuit;
+            return stQuit; // quit
         case comError:
             std::cerr << "Error" << std::endl;
             return stError;
     }
-    return stOk;
+    return stOk; // continue on a loop
 }
 
 Status CommandParser::Save(std::string const& fileName)
@@ -67,7 +68,7 @@ Status CommandParser::Save(std::string const& fileName)
     catch(...)
     {
         std::cerr << "Error: Save failed\n";
-        status = stError;
+        throw; // re-throw
     }
     return status;
 }
@@ -86,7 +87,7 @@ Status CommandParser::Load(std::string const& fileName)
     }
     catch(char const * fileName)
     {
-        std::cerr << "Error: Load failed:" << msg << std::endl;
+        std::cerr << "Error: Load failed:" << std::endl;
         status = stError;
     }
     catch(...)
