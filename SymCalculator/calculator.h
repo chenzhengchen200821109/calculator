@@ -9,6 +9,8 @@
 #include <QStringListModel>
 #include <QStringList>
 #include <QString>
+#include "../Calculator.h"
+#include "../parser.h"
 
 class calculator : public QWidget
 {
@@ -38,6 +40,10 @@ private:
 
     // calculate
     QString calculate(const QString& text);
+
+    // internal objects
+    Status status;
+    Calculator calc;
 };
 
 #endif // CALCULATOR_H

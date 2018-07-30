@@ -3,7 +3,7 @@
 
 Parser::Parser(Scanner& scanner, Calculator& calc) : _scanner(scanner), _calc(calc), _status(stOk)
 {
-    std::cout << "Parser created\n";
+    //std::cout << "Parser created\n";
 }
 
 double Parser::Calculate()
@@ -29,10 +29,10 @@ Status Parser::Parse()
 }
 
 //Node* Parser::Expr()
-std::auto_ptr<Node> Parser::Expr()
+std::unique_ptr<Node> Parser::Expr()
 {
     //Node* pNode = Term();
-    std::auto_ptr<Node> pNode = Term();
+    std::unique_ptr<Node> pNode = Term();
     if (pNode.get() == 0)
         return pNode;
 
@@ -40,23 +40,23 @@ std::auto_ptr<Node> Parser::Expr()
     // Expr := Term {('+' | '-')Term}
     if (token == tPlus || token == tMinus) {
         //MultiNode* pMultiNode = new SumNode(pNode);
-        std::auto_ptr<MultiNode> pMultiNode(new SumNode(pNode));
+        std::unique_ptr<MultiNode> pMultiNode(new SumNode(std::move(pNode)));
         do {
             _scanner.Accept();
             //Node* pRight = Term();
-            std::auto_ptr<Node> pRight = Term();
+            std::unique_ptr<Node> pRight = Term();
             if (pRight.get() == 0)
                 return pNode;
-            pMultiNode->AddChild(pRight, (token == tPlus));
+            pMultiNode->AddChild(std::move(pRight), (token == tPlus));
             token = _scanner.Token();
         } while (token == tPlus || token == tMinus);
-        pNode = pMultiNode;
+        pNode = std::move(pMultiNode);
     } else if (token == tAssign) {
         _scanner.Accept();
         // Expr := Term = Expr
-        std::auto_ptr<Node> pRight = Expr();
+        std::unique_ptr<Node> pRight = Expr();
         if (pNode->IsLvalue()) {
-            pNode = std::auto_ptr<Node>(new AssignNode(pNode, pRight));
+            pNode = std::unique_ptr<Node>(new AssignNode(std::move(pNode), std::move(pRight)));
         } else {
             _status = stError;
             //delete pNode;
@@ -66,51 +66,71 @@ std::auto_ptr<Node> Parser::Expr()
     return pNode;
 }
 
-std::auto_ptr<Node> Parser::Term()
+std::unique_ptr<Node> Parser::Term()
 {
-    std::auto_ptr<Node> pNode = Factor();
+    std::unique_ptr<Node> pNode = Factor();
     EToken token = _scanner.Token();
     if (token == tMult || token == tDivide) {
         // Term := Factor {('*' | '/')Factor}
-        std::auto_ptr<MultiNode> pMultiNode(new ProductNode(pNode));
+        std::unique_ptr<MultiNode> pMultiNode(new ProductNode(std::move(pNode)));
         do {
             _scanner.Accept();
-            std::auto_ptr<Node> pRight = Term();
-            pMultiNode->AddChild(pRight, (token == tMult));
+            std::unique_ptr<Node> pRight = Term();
+            pMultiNode->AddChild(std::move(pRight), (token == tMult));
             token = _scanner.Token();
         } while (token == tMult || token == tDivide);
-        pNode = pMultiNode;
+        pNode = std::move(pMultiNode);
     }  
     return pNode;
 }
 
-std::auto_ptr<Node> Parser::Factor()
+std::unique_ptr<Node> Parser::Factor()
 {
-    std::auto_ptr<Node> pNode;
+    std::unique_ptr<Node> pNode;
     EToken token = _scanner.Token();
 
-    if (token == tLParen) {
+    if (token == tLParen) { // "("
         _scanner.Accept();
         pNode = Expr();
         if (_scanner.Token() != tRParen)
             _status = stError;
         else
             _scanner.Accept();
-    } else if (token == tNumber) {
-        pNode = std::auto_ptr<Node>((new NumNode(_scanner.Number())));
+    } else if (token == tNumber) { // "898"
+        pNode = std::unique_ptr<Node>((new NumNode(_scanner.Number())));
         _scanner.Accept();
-    } else if (token == tIdent) {
+    } else if (token == tIdent) { // "xy"
         std::string strSymbol = _scanner.GetSymbolName();
         std::cout << "symbol = " << strSymbol << std::endl;
-        int id = _calc.FindSymbol(strSymbol);
-        std::cout << "id = " << id << std::endl;
-        if (id == SymbolTable::idNotFound) {
-            id = _calc.AddSymbol(strSymbol);
-        }
-        assert(id != SymbolTable::idNotFound);
-        pNode = std::auto_ptr<Node>(new VarNode(id, _calc.GetStore()));
+        size_t id = _calc.FindSymbol(strSymbol);
         _scanner.Accept();
-    } else {
+        // built-in functions
+        if (_scanner.Token() == tLParen) {
+            _scanner.Accept();
+            pNode = Expr();
+            if (_scanner.Token() == tRParen)
+                _scanner.Accept();
+            else
+                _status = stError;
+            if (id != SymbolTable::idNotFound && _calc.IsFunction(id)) {
+                pNode = std::unique_ptr<Node>(new FunNode(_calc.GetFun(id), std::move(pNode)));
+            } else {
+                std::cout << "Unknow function " << strSymbol << std::endl;
+            }
+        } else {
+            std::cout << "id = " << id << std::endl;
+            if (id == SymbolTable::idNotFound) {
+                id = _calc.AddSymbol(strSymbol);
+            }
+            assert(id != SymbolTable::idNotFound);
+            pNode = std::unique_ptr<Node>(new VarNode(id, _calc.GetStore()));
+            //_scanner.Accept();
+        }
+    } else if (token == tMinus) {
+        _scanner.Accept();
+        pNode = std::unique_ptr<Node>(Factor());
+    }
+    else {
         _scanner.Accept();
         _status = stError;
         //pNode = 0;

@@ -1,12 +1,11 @@
-#if !defined tree_h
-#define tree_h
+#if !defined _TREE_H
+#define _TREE_H
 
+#include "functionTable.h"
 #include "store.h"
 #include <vector>
 #include <memory>
 #include <iterator>
-
-//const int MAX_CHILDREN = 8;
 
 // abstract class
 class Node 
@@ -18,48 +17,79 @@ class Node
         {
             return false;
         }
-        virtual void Assign(double value) {}
+        virtual void Assign(double) {}
 };
 
 class MultiNode : public Node
 {
     public:
-        MultiNode(std::auto_ptr<Node>& pNode)
+        MultiNode(std::unique_ptr<Node> pNode)
         {
-            AddChild(pNode, true);
+            AddChild(std::move(pNode), true);
         }
         ~MultiNode();
-        void AddChild(std::auto_ptr<Node>& pNode, bool isPositive)
+        void AddChild(std::unique_ptr<Node> pNode, bool isPositive)
         {
-            _aChild.push_back(pNode.release());
+            _aChild.push_back(std::move(pNode));
             _aIsPositive.push_back(isPositive);
         }
     protected:
-        std::vector<Node*> _aChild;
+        std::vector<std::unique_ptr<Node>> _aChild;
         std::vector<bool> _aIsPositive;
 };
 
 class SumNode : public MultiNode
 {
     public:
-        SumNode(std::auto_ptr<Node>& pNode) : MultiNode(pNode) {};
+        SumNode(std::unique_ptr<Node> pNode) : MultiNode(std::move(pNode)) {};
         double Calc() const;
 };
 
 class ProductNode : public MultiNode
 {
     public:
-        ProductNode(std::auto_ptr<Node>& pNode) : MultiNode(pNode) {};
+        ProductNode(std::unique_ptr<Node> pNode) : MultiNode(std::move(pNode)) {};
         double Calc() const;
 };
 
 class BinNode : public Node
 {
     public:
-        BinNode(std::auto_ptr<Node>& pLeft, std::auto_ptr<Node>& pRight) : _pLeft(pLeft), _pRight(pRight) {}
+        BinNode(std::unique_ptr<Node> pLeft, std::unique_ptr<Node> pRight) : _pLeft(std::move(pLeft)), _pRight(std::move(pRight)) {}
     protected:
-        std::auto_ptr<Node> _pLeft;
-        std::auto_ptr<Node> _pRight;
+        std::unique_ptr<Node> _pLeft;
+        std::unique_ptr<Node> _pRight;
+};
+
+class UniNode : public Node
+{
+    public:
+        UniNode(std::unique_ptr<Node> pNode) : _pNode(std::move(pNode)) {}
+    protected:
+        std::unique_ptr<Node> _pNode;
+};
+
+class FunNode : public UniNode
+{
+    public:
+        FunNode(PtrFun pFun, std::unique_ptr<Node> pNode) : UniNode(std::move(pNode)), _pFun(pFun) {};
+        double Calc() const
+        {
+            assert(_pFun != 0);
+            return (*_pFun)(_pNode->Calc());
+        }
+    private:
+        PtrFun _pFun;
+};
+
+class UMinusNode : public UniNode
+{
+    public:
+        UMinusNode(std::unique_ptr<Node> pNode) : UniNode(std::move(pNode)) {}
+        double Calc() const
+        {
+            return (-1.0) * (_pNode->Calc());
+        }
 };
 
 class NumNode: public Node
@@ -71,6 +101,7 @@ class NumNode: public Node
         const double _num;
 };
 
+// variables and functions
 class VarNode : public Node
 {
     public:
@@ -86,39 +117,40 @@ class VarNode : public Node
 class AddNode : public BinNode
 {
     public:
-        AddNode(std::auto_ptr<Node>& pLeft, std::auto_ptr<Node>& pRight) : BinNode(pLeft, pRight) {}
+        AddNode(std::unique_ptr<Node> pLeft, std::unique_ptr<Node> pRight) : BinNode(std::move(pLeft), std::move(pRight)) {}
         double Calc() const;
 };
 
 class MultNode : public BinNode
 {
     public:
-        MultNode(std::auto_ptr<Node>& pLeft, std::auto_ptr<Node>& pRight) : BinNode(pLeft, pRight) {}
+        MultNode(std::unique_ptr<Node> pLeft, std::unique_ptr<Node> pRight) : BinNode(std::move(pLeft), std::move(pRight)) {}
         double Calc() const;
 };
 
 class SubNode : public BinNode
 {
     public:
-        SubNode(std::auto_ptr<Node>& pLeft, std::auto_ptr<Node>& pRight) : BinNode(pLeft, pRight) {}
+        SubNode(std::unique_ptr<Node> pLeft, std::unique_ptr<Node> pRight) : BinNode(std::move(pLeft), std::move(pRight)) {}
         double Calc() const;
 };
 
 class DivideNode : public BinNode
 {
     public:
-        DivideNode(std::auto_ptr<Node>& pLeft, std::auto_ptr<Node>& pRight) : BinNode(pLeft, pRight) {}
+        DivideNode(std::unique_ptr<Node> pLeft, std::unique_ptr<Node> pRight) : BinNode(std::move(pLeft), std::move(pRight)) {}
         double Calc() const;
 };
 
 class AssignNode : public BinNode
 {
     public:
-        AssignNode(std::auto_ptr<Node>& pLeft, std::auto_ptr<Node>& pRight) : BinNode(pLeft, pRight)
+        AssignNode(std::unique_ptr<Node> pLeft, std::unique_ptr<Node> pRight) : BinNode(std::move(pLeft), std::move(pRight))
         {
             assert(_pLeft->IsLvalue());
         }
         double Calc() const;
 };
+
 
 #endif

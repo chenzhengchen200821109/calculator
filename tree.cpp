@@ -47,18 +47,21 @@ double MultNode::Calc() const
     return (_pLeft->Calc()) * (_pRight->Calc());
 }
 
+// -
 double SubNode::Calc() const
 {
     std::cout << "Substracting\n";
     return _pLeft->Calc() - _pRight->Calc();
 }
 
+// divide
 double DivideNode::Calc() const
 {
     std::cout << "Dividing\n";
     return _pLeft->Calc() / _pRight->Calc();
 }
 
+// assignment
 double AssignNode::Calc() const
 {
     double x = _pRight->Calc();
@@ -68,11 +71,12 @@ double AssignNode::Calc() const
 
 MultiNode::~MultiNode()
 {
-    typedef std::vector<Node *>::iterator NodeIter;
-    for (NodeIter it = _aChild.begin(); it != _aChild.end(); ++it)
-        delete *it;
+    //typedef std::vector<std::unqiue_ptr<Node>>::iterator NodeIter;
+    //for (NodeIter it = _aChild.begin(); it != _aChild.end(); ++it)
+    //    delete *it;
 }
 
+// +
 double SumNode::Calc() const
 {
     double sum = 0.0;
@@ -86,6 +90,7 @@ double SumNode::Calc() const
     return sum;
 }
 
+// *
 double ProductNode::Calc() const
 {
     double prod = 1.0;

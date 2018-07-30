@@ -92,28 +92,22 @@ void calculator::loadToMemory()
 QString calculator::calculate(const QString &text)
 {
     std::string str = text.toStdString();
-    Status status;
-    Calculator calc;
 
-    //do {
-        Scanner scanner(str);
-        if (!scanner.IsEmpty()) {
-            if (scanner.IsCommand()) {
-                CommandParser parser(scanner, calc);
-                status = parser.Execute();
-            } else {
-                Parser parser(scanner, calc);
-                status = parser.Parse();
-                if (status == stOk) {
-                    double result = parser.Calculate();
-                    return QString::number(result);
-                } else {
-                    return QString("###");
-                }
-            }
+    Scanner scanner(str);
+    if (!scanner.IsEmpty()) {
+        if (scanner.IsCommand()) {
+            CommandParser parser(scanner, calc);
+            status = parser.Execute();
         } else {
-            //break;
-            return text;
+            Parser parser(scanner, calc);
+            status = parser.Parse();
+            if (status == stOk) {
+                double result = parser.Calculate();
+                return QString::number(result);
+            } else {
+                return QString("###");
+            }
         }
-    //} while (status != stQuit);
+    }
+    return text;
 }

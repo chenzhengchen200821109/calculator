@@ -4,6 +4,7 @@
 #include "scanner.h"
 #include "tree.h"
 #include "Calculator.h"
+#include "functionTable.h"
 
 enum Status
 {
@@ -19,13 +20,13 @@ class Parser
         double Calculate();
         Status Parse();
     private:
-        std::auto_ptr<Node> Expr();
-        std::auto_ptr<Node> Term();
-        std::auto_ptr<Node> Factor();
+        std::unique_ptr<Node> Expr();
+        std::unique_ptr<Node> Term();
+        std::unique_ptr<Node> Factor();
+        std::unique_ptr<Node> _pTree;
         Scanner& _scanner;
-        std::auto_ptr<Node> _pTree;
-        Status _status;
         Calculator& _calc;
+        Status _status;
 };
 
 #endif

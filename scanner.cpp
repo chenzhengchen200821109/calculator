@@ -13,6 +13,7 @@ Scanner::Scanner(std::string& str) : _str(str), _index(0)
 
 void Scanner::Accept()
 {
+    // we come to the end of expression, no need to continue
     if (_index == _str.size()) {
         _token = tEnd;
         return;
@@ -59,7 +60,6 @@ void Scanner::Accept()
                 ++_index;
                 _ch = _str[_index];
             } while (std::isdigit(_ch) || _ch == '.');
-            //std::cout << _symbol << std::endl;
             _number = std::stod(_symbol);
             break;
         }
@@ -67,11 +67,6 @@ void Scanner::Accept()
             _token = tCommand;
             ++_index;
             break;
-        //case '\n':
-        //case '\r':
-        //case EOF:
-        //    _token = tEnd;
-        //    break;
         default:
             if (std::isalpha(_ch) || _ch == '_')
             {

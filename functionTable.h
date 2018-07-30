@@ -13,11 +13,11 @@ namespace Function
         public:
             Table(SymbolTable & symTab);
             ~Table();
-            int Size() const { return _size; }
+            size_t Size() const { return _size; }
             PtrFun GetFun(int id) const { return _pFun[id]; }
         private:
             PtrFun *_pFun;
-            int _size;
+            size_t _size;
     };
 }
 

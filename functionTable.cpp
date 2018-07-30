@@ -16,11 +16,10 @@ namespace Function
         return 1.0/y;
     }
 
-    class Entry 
+    struct Entry
     {
-        public:
-            PtrFun pFun;
-            char *strFun;
+        PtrFun pFun;
+        char *strFun;
     };
 
     Entry Array[] =
@@ -45,14 +44,14 @@ namespace Function
     Table::Table(SymbolTable & symTab) : _size(sizeof Array / sizeof Array[0])
     {
         _pFun = new PtrFun [_size];
-        for (int i = 0; i < _size; ++i)
+        for (size_t i = 0; i < _size; ++i)
         {
             int len = std::strlen(Array[i].strFun);
             if (len == 0)
                 break;
             _pFun[i] = Array[i].pFun;
-            std::cout << Array[i].strFun << std::endl;
-            int j = symTab.ForceAdd(Array[i].strFun);
+            //std::cout << Array[i].strFun << std::endl;
+            size_t j = symTab.ForceAdd(Array[i].strFun);
             assert(i == j);
         }
     }

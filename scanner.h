@@ -50,7 +50,7 @@ class Scanner
     private:
         std::string& _str;
         char _ch;
-        int _index;
+        size_t _index;
         bool _isEmpty;
         EToken _token;
         double _number;

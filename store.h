@@ -17,13 +17,13 @@ class Store
         }
         double Value(std::size_t id) const
         {
-            assert(id >= 0);
+            //assert(id >= 0);
             assert(IsInit(id));
             return _cell[id];
         }
         void SetValue(std::size_t id, double val)
         {
-            assert(id >= 0);
+            //assert(id >= 0);
             if (IsInit(id))
             {
                 _cell[id] = val;
@@ -36,7 +36,7 @@ class Store
         }
         void AddValue(std::size_t id, double val)
         {
-            assert(id >= 0);
+            //assert(id >= 0);
             _cell.resize(id + 1);
             _isInit.resize(id + 1);
             _cell[id] = val;
