@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     ../parser.cpp \
     ../hashTable.cpp \
     ../functionTable.cpp \
-    ../commandParser.cpp
+    ../commandParser.cpp \
+    symbollistitem.cpp
 
 HEADERS  += mainwindow.h \
     calculator.h \
@@ -41,6 +42,7 @@ HEADERS  += mainwindow.h \
     ../hashTable.h \
     ../functionTable.h \
     ../commandParser.h \
-    ../Calculator.h
+    ../Calculator.h \
+    symbollistitem.h
 
 FORMS    += mainwindow.ui

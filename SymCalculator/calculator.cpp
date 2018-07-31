@@ -5,6 +5,7 @@
 #include "../Calculator.h"
 #include "../commandParser.h"
 #include <cstring>
+#include "symbollistitem.h"
 
 calculator::calculator(QWidget *parent) :
     QWidget(parent)
@@ -32,15 +33,35 @@ calculator::calculator(QWidget *parent) :
 
     inListView = new QListView(this);
 
-    outListView = new QListView(this);
+    // =========================================
+    //outListView = new QListView(this);
+    outListWidget = new QListWidget(this);
+    QListWidgetItem* item1 = new QListWidgetItem(outListWidget);
+    QListWidgetItem* item2 = new QListWidgetItem(outListWidget);
+    outListWidget->addItem(item1);
+    outListWidget->addItem(item2);
 
+    SymbolListItem* myWidget = new SymbolListItem(outListWidget);
+    SymbolListItem* hisWidget = new SymbolListItem(outListWidget);
+    myWidget->show();
+
+    outListWidget->setItemWidget(item1, myWidget);
+    outListWidget->setItemWidget(item2, hisWidget);
+
+    item1->setSizeHint(QSize(myWidget->rect().width(), myWidget->rect().height()));
+    item2->setSizeHint(QSize(myWidget->rect().width(), myWidget->rect().height()));
+
+    //myWidget->show();
+
+    // =========================================
     leftLayout = new QVBoxLayout;
     leftLayout->addWidget(inputLine);
     leftLayout->addWidget(inListView);
 
     rightLayout = new QVBoxLayout;
     rightLayout->addWidget(outputLine);
-    rightLayout->addWidget(outListView);
+    //rightLayout->addWidget(outListView);
+    rightLayout->addWidget(outListWidget);
 
     mainLayout = new QHBoxLayout;
     mainLayout->addLayout(leftLayout);
@@ -57,10 +78,10 @@ calculator::calculator(QWidget *parent) :
 void calculator::onReturnPressed()
 {
     QString text = inputLine->text();
-    //text += "\n";
     QString result = calculate(text);
     outputLine->setText(result);
 
+    //if (text.contains("="))
     text += " = ";
     text += result;
     list->append(text);
@@ -110,4 +131,9 @@ QString calculator::calculate(const QString &text)
         }
     }
     return text;
+}
+
+void calculator::displayListWidget()
+{
+    //QWidget* wid;
 }

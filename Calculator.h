@@ -21,6 +21,10 @@ class Calculator
             _symTab.DeSerialize(in);
             _store.DeSerialize(in);
         }
+        SymbolTable getSymbolTable() const
+        {
+            return _symTab;
+        }
     private:
         Store& GetStore() { return _store; }
         PtrFun GetFun(std::size_t id) const

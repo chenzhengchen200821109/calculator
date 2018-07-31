@@ -9,6 +9,7 @@
 #include <QStringListModel>
 #include <QStringList>
 #include <QString>
+#include <QListWidget>
 #include "../Calculator.h"
 #include "../parser.h"
 
@@ -34,7 +35,8 @@ private:
     QHBoxLayout* mainLayout;
 
     QListView* inListView;
-    QListView* outListView;
+    //QListView* outListView;
+    QListWidget* outListWidget;
     QStringListModel* model;
     QStringList* list;
 
@@ -44,6 +46,8 @@ private:
     // internal objects
     Status status;
     Calculator calc;
+
+    void displayListWidget();
 };
 
 #endif // CALCULATOR_H
